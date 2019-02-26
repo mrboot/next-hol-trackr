@@ -18,24 +18,20 @@ class Index extends React.Component {
     return { holidays };
   };
 
-  // async componentDidUpdate(prevProps, prevState) {
-  //   if (this.state.updated) {
-  //     const res = await fetch('http://localhost:3000/db/holidays');
-  //     const holidays = await res.json();
-  //     this.setState({ holidays, updated: false });
-  //     // this.toggleUpdated;
-  //   }
-  // }
+  async componentDidUpdate() {
+    const { updated } = this.state;
+    if (updated) {
+      this.refreshTable();
+    }
+  }
 
-  // componentDidUpdate: function() {
-  //   this.onUpdate(function callback(newName) {
-  //     this.setState({
-  //       name: newName
-  //     });
-  //   });
+  refreshTable = async () => {
+    const res = await fetch('http://localhost:3000/db/holidays');
+    const holidays = await res.json();
+    this.setState({ holidays, updated: false });
+  };
 
   toggleUpdated = () => {
-    // const { updated } = this.state;
     this.state.updated ? this.setState({ updated: false }) : this.setState({ updated: true });
   };
 
@@ -47,7 +43,7 @@ class Index extends React.Component {
     const { holidays } = this.state;
     return (
       <div style={{ marginTop: 50, marginLeft: 50, marginRight: 50 }}>
-        <HolidayTable holidays={holidays} />
+        <HolidayTable holidays={holidays} dbAltered={this.toggleUpdated} />
         <Divider>Add New Holiday</Divider>
         <HolidayForm onAddRefresh={this.toggleUpdated} />
       </div>

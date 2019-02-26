@@ -60,7 +60,7 @@ class HolidayForm extends React.Component {
         payload.duration = fieldsValue.duration;
         this.addHolidayToDB(payload);
         this.props.onAddRefresh();
-        console.log(payload);
+        this.props.form.resetFields();
       }
     });
   };
