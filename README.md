@@ -1,44 +1,20 @@
-[![Deploy to now](https://deploy.now.sh/static/button.svg)](https://deploy.now.sh/?repo=https://github.com/zeit/next.js/tree/master/examples/with-ant-design)
+# NEXT-HOL-TRACKR
 
-# Ant Design example
+### Another go at creating an app to track holidays booked and accrued
 
-## How to use
+Using:
 
-### Using `create-next-app`
+- React via Next.js with a custom Express server to expose the database
+- diskDB to store the data
+- Ant-Design as a GUI framework
+- isometeric-unfetch to get the data exposed in the database
 
-Execute [`create-next-app`](https://github.com/segmentio/create-next-app) with [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/) or [npx](https://github.com/zkat/npx#readme) to bootstrap the example:
+Learning as I go so expect mistakes and \*\*cough\*\* not industry standard coding standards I would imagine!
 
-```bash
-npx create-next-app --example with-ant-design with-ant-design-app
-# or
-yarn create next-app --example with-ant-design with-ant-design-app
-```
+## TODO:
 
-### Download manually
-
-Download the example:
-
-```bash
-curl https://codeload.github.com/zeit/next.js/tar.gz/canary | tar -xz --strip=2 next.js-canary/examples/with-ant-design
-cd with-ant-design
-```
-
-Install it and run:
-
-```bash
-npm install
-npm run dev
-# or
-yarn
-yarn dev
-```
-
-Deploy it to the cloud with [now](https://zeit.co/now) ([download](https://zeit.co/download))
-
-```bash
-now
-```
-
-## The idea behind the example
-
-This example shows how to use Next.js along with [Ant Design of React](http://ant.design). This is intended to show the integration of this UI toolkit with the Framework.
+- account for weekends and bank holidays when calculating time
+- auto-fill time for entitlement
+- make positive or nigative hours based on category
+- display in hours and days
+- display current balance
