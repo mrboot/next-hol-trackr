@@ -15,6 +15,6 @@ Learning as I go so expect mistakes and \*\*cough\*\* not industry standard codi
 
 - account for weekends and bank holidays when calculating time
 - auto-fill time for entitlement
-- make positive or nigative hours based on category
+- make positive or negative hours based on category
 - display in hours and days
 - display current balance
