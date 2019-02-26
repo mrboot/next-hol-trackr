@@ -39,6 +39,7 @@
     "no-unused-expressions": [
       2,
       {
+        "allowTernary": true,
         "allowTaggedTemplates": true
       }
     ],

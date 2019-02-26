@@ -59,7 +59,7 @@ class HolidayForm extends React.Component {
         payload.toDate = toDate;
         payload.duration = fieldsValue.duration;
         this.addHolidayToDB(payload);
-        // this.props.onAddRefresh();
+        this.props.onAddRefresh();
         console.log(payload);
       }
     });
@@ -88,15 +88,7 @@ class HolidayForm extends React.Component {
             {getFieldDecorator('category', {
               initialValue: 'Holiday',
               rules: [{ required: true, message: 'Please pick a category!' }],
-            })(
-              <Select style={{ width: 192 }}>
-                {optionItems}
-                {/* <Option value="holiday">Holiday</Option>
-                <Option value="toilearn">TOIL (earned)</Option>
-                <Option value="toiltake">TOIL (taken)</Option>
-                <Option value="entitlement">Entitlement</Option> */}
-              </Select>
-            )}
+            })(<Select style={{ width: 192 }}>{optionItems}</Select>)}
           </FormItem>
           <FormItem label="Select Dates:" labelCol={{ span: 4 }} wrapperCol={{ span: 14 }}>
             {getFieldDecorator('range-picker', rangeConfig)(
