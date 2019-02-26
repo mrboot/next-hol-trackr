@@ -1,20 +1,37 @@
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import { DatePicker, Form, Input, InputNumber, Button, Select } from 'antd';
+import fetch from 'isomorphic-unfetch';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 class HolidayForm extends React.Component {
-  // state = {
-  //   startDate: '',
-  //   endDate: '',
-  // };
+  state = {
+    categories: [],
+  };
 
-  onChange = date => {
-    const fromDate = date[0];
-    const toDate = date[1];
+  async componentDidMount() {
+    const res = await fetch('http://localhost:3000/db/categories');
+    const categories = await res.json();
+    this.setState({ categories });
+  }
+
+  addHolidayToDB = data => {
+    fetch('http://localhost:3000/db/holidays', {
+      method: 'post',
+      headers: {
+        Accept: 'application/json, text/plain, */*',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+  };
+
+  onChangeDates = dateRange => {
+    const fromDate = dateRange[0];
+    const toDate = dateRange[1];
     let numHours = 0;
     if (fromDate !== undefined && toDate !== undefined) {
       if (fromDate === toDate) {
@@ -26,8 +43,6 @@ class HolidayForm extends React.Component {
     this.props.form.setFieldsValue({
       duration: numHours,
     });
-    // this.setState({ startDate: fromDate });
-    // this.setState({ endDate: toDate });
   };
 
   handleSubmit = e => {
@@ -37,13 +52,26 @@ class HolidayForm extends React.Component {
         const rangeValue = fieldsValue['range-picker'];
         const fromDate = rangeValue[0].format('YYYY-MM-DD');
         const toDate = rangeValue[1].format('YYYY-MM-DD');
-        const { description, category, duration } = fieldsValue;
-        console.log(description, category, fromDate, toDate, duration);
+        const payload = {};
+        payload.description = fieldsValue.description;
+        payload.category = fieldsValue.category;
+        payload.fromDate = fromDate;
+        payload.toDate = toDate;
+        payload.duration = fieldsValue.duration;
+        this.addHolidayToDB(payload);
+        // this.props.onAddRefresh();
+        console.log(payload);
       }
     });
   };
 
   render() {
+    const { categories } = this.state;
+    const optionItems = categories.map(category => (
+      <Option key={category._id} value={category.name}>
+        {category.name}
+      </Option>
+    ));
     const { getFieldDecorator } = this.props.form;
     const rangeConfig = {
       rules: [{ type: 'array', required: true, message: 'Please select dates!' }],
@@ -62,16 +90,17 @@ class HolidayForm extends React.Component {
               rules: [{ required: true, message: 'Please pick a category!' }],
             })(
               <Select style={{ width: 192 }}>
-                <Option value="holiday">Holiday</Option>
+                {optionItems}
+                {/* <Option value="holiday">Holiday</Option>
                 <Option value="toilearn">TOIL (earned)</Option>
                 <Option value="toiltake">TOIL (taken)</Option>
-                <Option value="entitlement">Entitlement</Option>
+                <Option value="entitlement">Entitlement</Option> */}
               </Select>
             )}
           </FormItem>
           <FormItem label="Select Dates:" labelCol={{ span: 4 }} wrapperCol={{ span: 14 }}>
             {getFieldDecorator('range-picker', rangeConfig)(
-              <RangePicker format="DD/MM/YYYY" onChange={this.onChange} />
+              <RangePicker format="DD/MM/YYYY" onChange={this.onChangeDates} />
             )}
           </FormItem>
           <FormItem label="Duration:" labelCol={{ span: 4 }} wrapperCol={{ span: 14 }}>
