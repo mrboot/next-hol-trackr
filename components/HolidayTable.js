@@ -2,6 +2,8 @@
 import { Table, Tag, Button } from 'antd';
 
 const HolidayTable = props => {
+  const { categories, holidays } = props;
+
   const deleteHoliday = holID => {
     fetch(`http://localhost:3000/db/holiday/${holID}`, {
       method: 'DELETE',
@@ -17,13 +19,11 @@ const HolidayTable = props => {
     props.dbAltered();
   };
 
-  // TODO: read this from the database
-  const colours = {
-    Holiday: 'green',
-    Entitlement: 'gold',
-    'TOIL (taken)': 'geekblue',
-    'TOIL (earned)': 'purple',
-  };
+  const colours = {};
+  categories.map(category => {
+    colours[category.name] = category.colour;
+    return colours;
+  });
 
   const columns = [
     {
@@ -64,7 +64,6 @@ const HolidayTable = props => {
     },
   ];
 
-  const { holidays } = props;
   return (
     <div style={{ marginLeft: 50, marginRight: 50 }}>
       <Table columns={columns} dataSource={holidays} rowKey={record => record._id} />

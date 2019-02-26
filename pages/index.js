@@ -9,13 +9,16 @@ import HolidayForm from '../components/HolidayForm';
 class Index extends React.Component {
   state = {
     holidays: this.props.holidays,
+    categories: this.props.categories,
     updated: false,
   };
 
   static getInitialProps = async function() {
-    const res = await fetch('http://localhost:3000/db/holidays');
-    const holidays = await res.json();
-    return { holidays };
+    const holRes = await fetch('http://localhost:3000/db/holidays');
+    const holidays = await holRes.json();
+    const catRes = await fetch('http://localhost:3000/db/categories');
+    const categories = await catRes.json();
+    return { holidays, categories };
   };
 
   async componentDidUpdate() {
@@ -40,12 +43,12 @@ class Index extends React.Component {
   };
 
   render() {
-    const { holidays } = this.state;
+    const { holidays, categories } = this.state;
     return (
       <div style={{ marginTop: 50, marginLeft: 50, marginRight: 50 }}>
-        <HolidayTable holidays={holidays} dbAltered={this.toggleUpdated} />
+        <HolidayTable holidays={holidays} categories={categories} dbAltered={this.toggleUpdated} />
         <Divider>Add New Holiday</Divider>
-        <HolidayForm onAddRefresh={this.toggleUpdated} />
+        <HolidayForm categories={categories} onAddRefresh={this.toggleUpdated} />
       </div>
     );
   }

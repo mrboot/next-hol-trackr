@@ -8,16 +8,6 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 class HolidayForm extends React.Component {
-  state = {
-    categories: [],
-  };
-
-  async componentDidMount() {
-    const res = await fetch('http://localhost:3000/db/categories');
-    const categories = await res.json();
-    this.setState({ categories });
-  }
-
   addHolidayToDB = data => {
     fetch('http://localhost:3000/db/holidays', {
       method: 'post',
@@ -66,7 +56,7 @@ class HolidayForm extends React.Component {
   };
 
   render() {
-    const { categories } = this.state;
+    const { categories } = this.props;
     const optionItems = categories.map(category => (
       <Option key={category._id} value={category.name}>
         {category.name}
