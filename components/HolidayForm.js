@@ -1,13 +1,48 @@
+/* eslint-disable import/no-extraneous-dependencies */
 /* eslint-disable react/destructuring-assignment */
 import React from 'react';
 import { DatePicker, Form, Input, InputNumber, Button, Select } from 'antd';
 import fetch from 'isomorphic-unfetch';
+import twix from 'twix';
+import moment from 'moment';
 
 const FormItem = Form.Item;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 class HolidayForm extends React.Component {
+  state = {
+    bankHolidays: {},
+  };
+
+  async componentDidMount() {
+    const endpoint = 'https://www.gov.uk/bank-holidays.json';
+    const response = await fetch(endpoint);
+    const data = await response.json();
+    const england = data['england-and-wales'].events;
+    const hols = england.filter(hol => {
+      return this.isInTheFuture(hol.date);
+    });
+    this.setState({ bankHolidays: hols });
+  }
+
+  isWeekend = day => {
+    return !!(day.isoWeekday() === 6 || day.isoWeekday() === 7);
+  };
+
+  isInTheFuture = date => {
+    const today = moment(Date.now());
+    return moment(date).isSameOrAfter(today);
+  };
+
+  isBankHoliday = day => {
+    const { bankHolidays } = this.state;
+    const match = bankHolidays.filter(hol => {
+      return hol.date === day.format('YYYY-MM-DD');
+    });
+    return match.length > 0;
+  };
+
   addHolidayToDB = data => {
     fetch('http://localhost:3000/db/holidays', {
       method: 'post',
@@ -22,17 +57,16 @@ class HolidayForm extends React.Component {
   onChangeDates = dateRange => {
     const fromDate = dateRange[0];
     const toDate = dateRange[1];
-    let numHours = 0;
     if (fromDate !== undefined && toDate !== undefined) {
-      if (fromDate === toDate) {
-        numHours = 8;
-      } else {
-        numHours = toDate.diff(fromDate, 'days') * 8 + 8;
-      }
+      const selectedDays = fromDate.twix(toDate).toArray('days');
+      const weekdays = selectedDays
+        .filter(day => !this.isWeekend(day))
+        .filter(day => !this.isBankHoliday(day));
+      const numHours = weekdays.length * 8;
+      this.props.form.setFieldsValue({ duration: numHours });
+    } else {
+      this.props.form.resetFields('duration');
     }
-    this.props.form.setFieldsValue({
-      duration: numHours,
-    });
   };
 
   handleSubmit = e => {

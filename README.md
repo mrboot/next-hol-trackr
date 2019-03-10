@@ -9,12 +9,12 @@ Using:
 - Ant-Design as a GUI framework
 - isometeric-unfetch to get the data exposed in the database
 
-Learning as I go so expect mistakes and \*\*cough\*\* not industry standard coding standards I would imagine!
+Learning as I go so expect mistakes and _\*cough\*_ not industry standard coding standards I would imagine!
 
 ## TODO:
 
-- account for weekends and bank holidays when calculating time
-- auto-fill time for entitlement
-- make positive or negative hours based on category
-- display in hours and days
-- display current balance
+- [x] account for weekends and bank holidays when calculating time
+- [] auto-fill time for entitlement
+- [] make positive or negative hours based on category
+- [] display in hours and days
+- [] display current balance
