@@ -5,6 +5,7 @@ import { DatePicker, Form, Input, InputNumber, Button, Select } from 'antd';
 import fetch from 'isomorphic-unfetch';
 import twix from 'twix';
 import moment from 'moment';
+import { serverAddr } from '../config';
 
 const FormItem = Form.Item;
 const { Option } = Select;
@@ -44,7 +45,7 @@ class HolidayForm extends React.Component {
   };
 
   addHolidayToDB = data => {
-    fetch('http://localhost:3000/db/holidays', {
+    fetch(`${serverAddr}/db/holidays`, {
       method: 'post',
       headers: {
         Accept: 'application/json, text/plain, */*',

@@ -1,11 +1,12 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { Table, Tag, Button } from 'antd';
+import { serverAddr } from '../config';
 
 const HolidayTable = props => {
   const { categories, holidays } = props;
 
   const deleteHoliday = holID => {
-    fetch(`http://localhost:3000/db/holiday/${holID}`, {
+    fetch(`${serverAddr}/db/holiday/${holID}`, {
       method: 'DELETE',
       headers: {
         Accept: 'application/json, text/plain, */*',

@@ -2,6 +2,7 @@
 import React from 'react';
 import { Divider } from 'antd';
 import fetch from 'isomorphic-unfetch';
+import { serverAddr } from '../config';
 
 import HolidayTable from '../components/HolidayTable';
 import HolidayForm from '../components/HolidayForm';
@@ -14,9 +15,9 @@ class Index extends React.Component {
   };
 
   static getInitialProps = async function() {
-    const holRes = await fetch('http://localhost:3000/db/holidays');
+    const holRes = await fetch(`${serverAddr}/db/holidays`);
     const holidays = await holRes.json();
-    const catRes = await fetch('http://localhost:3000/db/categories');
+    const catRes = await fetch(`${serverAddr}/db/categories`);
     const categories = await catRes.json();
     return { holidays, categories };
   };
@@ -29,7 +30,7 @@ class Index extends React.Component {
   }
 
   refreshTable = async () => {
-    const res = await fetch('http://localhost:3000/db/holidays');
+    const res = await fetch(`${serverAddr}/db/holidays`);
     const holidays = await res.json();
     this.setState({ holidays, updated: false });
   };
