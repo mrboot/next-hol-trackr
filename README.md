@@ -13,8 +13,8 @@ Learning as I go so expect mistakes and _\*cough\*_ not industry standard coding
 
 ## TODO:
 
-- [x] account for weekends and bank holidays when calculating time
-- [] auto-fill time for entitlement
-- [] make positive or negative hours based on category
-- [] display in hours and days
-- [] display current balance
+- [x] ~~account for weekends and bank holidays when calculating time~~
+- [ ] auto-fill time for entitlement
+- [ ] make positive or negative hours based on category
+- [ ] display in hours and days
+- [ ] display current balance
