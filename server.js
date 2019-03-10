@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 const express = require('express');
+const cors = require('cors');
 const next = require('next');
 const db = require('diskdb');
 const bodyParser = require('body-parser');
@@ -14,6 +15,7 @@ const handle = app.getRequestHandler();
 app.prepare().then(() => {
   const server = express();
   server.use(bodyParser.json());
+  server.use(cors());
 
   // HOLIDAYS
   // CREATE
