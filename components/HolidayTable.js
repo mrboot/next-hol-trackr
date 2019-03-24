@@ -1,9 +1,13 @@
 /* eslint-disable react/react-in-jsx-scope */
 import { Table, Tag, Button } from 'antd';
+import moment from 'moment';
 import { serverAddr } from '../config';
 
 const HolidayTable = props => {
-  const { categories, holidays } = props;
+  const { categories, holidays, leaveYearStart, leaveYearEnd } = props;
+  const currentHolidays = holidays.filter(holiday => {
+    return moment(holiday.fromDate).isBefore(leaveYearEnd);
+  });
 
   const deleteHoliday = holID => {
     fetch(`${serverAddr}/db/holiday/${holID}`, {
@@ -14,6 +18,10 @@ const HolidayTable = props => {
       },
     });
   };
+
+  // const checkDates = (fromDate, toDate) => {
+
+  // }
 
   const handleClick = holID => {
     deleteHoliday(holID);
@@ -67,7 +75,7 @@ const HolidayTable = props => {
 
   return (
     <div style={{ marginLeft: 50, marginRight: 50 }}>
-      <Table columns={columns} dataSource={holidays} rowKey={record => record._id} />
+      <Table columns={columns} dataSource={currentHolidays} rowKey={record => record._id} />
     </div>
   );
 };

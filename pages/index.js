@@ -1,11 +1,14 @@
 /* eslint-disable func-names */
 import React from 'react';
-import { Divider } from 'antd';
+import { Divider, Button, Icon, Layout } from 'antd';
 import fetch from 'isomorphic-unfetch';
+import moment from 'moment';
 import { serverAddr } from '../config';
 
 import HolidayTable from '../components/HolidayTable';
 import HolidayForm from '../components/HolidayForm';
+
+const { Header, Content } = Layout;
 
 class Index extends React.Component {
   state = {
@@ -29,6 +32,22 @@ class Index extends React.Component {
     }
   }
 
+  getLeaveYear = () => {
+    const now = moment();
+    const currentYear = now.year();
+
+    if (now.isBefore(moment(`${currentYear}-04-01`))) {
+      const leaveYearStart = moment(`${currentYear - 1}-04-01`);
+      const leaveYearEnd = moment(`${currentYear}-03-31`);
+      const leaveYearDisplay = `${currentYear - 1} / ${currentYear}`;
+      return { leaveYearStart, leaveYearEnd, leaveYearDisplay };
+    }
+    const leaveYearStart = moment(`${currentYear}-04-01`);
+    const leaveYearEnd = moment(`${currentYear + 1}-03-31`);
+    const leaveYearDisplay = `${currentYear} / ${currentYear + 1}`;
+    return { leaveYearStart, leaveYearEnd, leaveYearDisplay };
+  };
+
   refreshTable = async () => {
     const res = await fetch(`${serverAddr}/db/holidays`);
     const holidays = await res.json();
@@ -45,12 +64,35 @@ class Index extends React.Component {
 
   render() {
     const { holidays, categories } = this.state;
+    const { leaveYearStart, leaveYearEnd, leaveYearDisplay } = this.getLeaveYear();
+
     return (
-      <div style={{ marginTop: 50, marginLeft: 50, marginRight: 50 }}>
-        <HolidayTable holidays={holidays} categories={categories} dbAltered={this.toggleUpdated} />
-        <Divider>Add New Holiday</Divider>
-        <HolidayForm categories={categories} onAddRefresh={this.toggleUpdated} />
-      </div>
+      <Layout>
+        <Header>
+          <Button type="primary">
+            <Icon type="left" />
+            Previous Year
+          </Button>
+          <span
+            style={{ fontSize: '1.5em', color: 'white', marginLeft: 10, marginRight: 10 }}
+          >{`Current Leave Year: ${leaveYearDisplay}`}</span>
+          <Button type="primary">
+            Next Year
+            <Icon type="right" />
+          </Button>
+        </Header>
+        <Content>
+          <HolidayTable
+            holidays={holidays}
+            categories={categories}
+            leaveYearStart={leaveYearStart}
+            leaveYearEnd={leaveYearEnd}
+            dbAltered={this.toggleUpdated}
+          />
+          <Divider>Add New Holiday</Divider>
+          <HolidayForm categories={categories} onAddRefresh={this.toggleUpdated} />
+        </Content>
+      </Layout>
     );
   }
 }

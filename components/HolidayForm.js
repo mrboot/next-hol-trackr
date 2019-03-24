@@ -58,12 +58,13 @@ class HolidayForm extends React.Component {
   onChangeDates = dateRange => {
     const fromDate = dateRange[0];
     const toDate = dateRange[1];
+    const holType = this.props.form.getFieldValue('category');
     if (fromDate !== undefined && toDate !== undefined) {
       const selectedDays = fromDate.twix(toDate).toArray('days');
       const weekdays = selectedDays
         .filter(day => !this.isWeekend(day))
         .filter(day => !this.isBankHoliday(day));
-      const numHours = weekdays.length * 8;
+      const numHours = holType === 'TOIL (earned)' ? selectedDays.length : weekdays.length * 8;
       this.props.form.setFieldsValue({ duration: numHours });
     } else {
       this.props.form.resetFields('duration');
@@ -121,7 +122,7 @@ class HolidayForm extends React.Component {
             )}
           </FormItem>
           <FormItem label="Duration:" labelCol={{ span: 4 }} wrapperCol={{ span: 14 }}>
-            {getFieldDecorator('duration')(<InputNumber min={0.5} step={0.5} />)}
+            {getFieldDecorator('duration')(<InputNumber step={0.5} />)}
           </FormItem>
           <FormItem wrapperCol={{ span: 8, offset: 4 }}>
             <Button type="primary" htmlType="submit">
