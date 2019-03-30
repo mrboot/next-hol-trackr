@@ -64,7 +64,7 @@ class HolidayForm extends React.Component {
       const weekdays = selectedDays
         .filter(day => !this.isWeekend(day))
         .filter(day => !this.isBankHoliday(day));
-      const numHours = holType === 'TOIL (earned)' ? selectedDays.length : weekdays.length * 8;
+      const numHours = holType === 'TOIL (earned)' ? selectedDays.length * 8 : weekdays.length * 8;
       this.props.form.setFieldsValue({ duration: numHours });
     } else {
       this.props.form.resetFields('duration');

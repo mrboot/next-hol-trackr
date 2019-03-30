@@ -4,10 +4,7 @@ import moment from 'moment';
 import { serverAddr } from '../config';
 
 const HolidayTable = props => {
-  const { categories, holidays, leaveYearStart, leaveYearEnd } = props;
-  const currentHolidays = holidays.filter(holiday => {
-    return moment(holiday.fromDate).isBefore(leaveYearEnd);
-  });
+  const { categories, currentHolidays } = props;
 
   const deleteHoliday = holID => {
     fetch(`${serverAddr}/db/holiday/${holID}`, {
@@ -19,9 +16,16 @@ const HolidayTable = props => {
     });
   };
 
-  // const checkDates = (fromDate, toDate) => {
+  const hoursToDays = hours => hours / 8;
 
-  // }
+  const displayDays = hours => {
+    if (hours === 0) {
+      return '';
+    }
+    const days = hoursToDays(hours);
+    const word = days > 1 ? 'days' : 'day';
+    return `${hours} hours (${days} ${word})`;
+  };
 
   const handleClick = holID => {
     deleteHoliday(holID);
@@ -60,6 +64,7 @@ const HolidayTable = props => {
     {
       title: 'Duration',
       dataIndex: 'duration',
+      render: duration => <span>{displayDays(duration)}</span>,
     },
     {
       title: '',

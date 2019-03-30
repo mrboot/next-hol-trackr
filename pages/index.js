@@ -48,6 +48,31 @@ class Index extends React.Component {
     return { leaveYearStart, leaveYearEnd, leaveYearDisplay };
   };
 
+  getCurrentEarned = holidays => {
+    const balance = holidays.reduce((bal, holiday) => {
+      return holiday.category === 'TOIL (earned)' ? bal + holiday.duration : bal;
+    }, 0);
+    return balance;
+  };
+
+  getCurrentTaken = holidays => {
+    const balance = holidays.reduce((bal, holiday) => {
+      return holiday.category !== 'TOIL (earned)' ? bal + holiday.duration : bal;
+    }, 0);
+    return balance;
+  };
+
+  hoursToDays = hours => hours / 8;
+
+  displayDays = hours => {
+    if (hours === 0) {
+      return '';
+    }
+    const days = this.hoursToDays(hours);
+    const word = days > 1 ? 'days' : 'day';
+    return `${hours} hours (${days} ${word})`;
+  };
+
   refreshTable = async () => {
     const res = await fetch(`${serverAddr}/db/holidays`);
     const holidays = await res.json();
@@ -65,6 +90,13 @@ class Index extends React.Component {
   render() {
     const { holidays, categories } = this.state;
     const { leaveYearStart, leaveYearEnd, leaveYearDisplay } = this.getLeaveYear();
+    const currentHolidays = holidays.filter(holiday => {
+      return moment(holiday.fromDate).isBefore(leaveYearEnd);
+    });
+    const entitlement = 200;
+    const earned = this.getCurrentEarned(currentHolidays);
+    const taken = this.getCurrentTaken(currentHolidays);
+    const balance = entitlement + earned - taken;
 
     return (
       <Layout>
@@ -82,11 +114,24 @@ class Index extends React.Component {
           </Button>
         </Header>
         <Content>
+          <div>
+            <p
+              style={{
+                fontSize: '1.5em',
+                marginLeft: 50,
+                marginRight: 50,
+                marginTop: 10,
+              }}
+            >
+              {`Entitlement: ${this.displayDays(entitlement)}, 
+              Earned: ${this.displayDays(earned)}, 
+              Taken: ${this.displayDays(taken)}, 
+              Remaining: ${this.displayDays(balance)}`}
+            </p>
+          </div>
           <HolidayTable
-            holidays={holidays}
+            currentHolidays={currentHolidays}
             categories={categories}
-            leaveYearStart={leaveYearStart}
-            leaveYearEnd={leaveYearEnd}
             dbAltered={this.toggleUpdated}
           />
           <Divider>Add New Holiday</Divider>
