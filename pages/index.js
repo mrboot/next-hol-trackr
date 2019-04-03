@@ -91,7 +91,10 @@ class Index extends React.Component {
     const { holidays, categories } = this.state;
     const { leaveYearStart, leaveYearEnd, leaveYearDisplay } = this.getLeaveYear();
     const currentHolidays = holidays.filter(holiday => {
-      return moment(holiday.fromDate).isBefore(leaveYearEnd);
+      return (
+        moment(holiday.fromDate).isAfter(leaveYearStart) &&
+        moment(holiday.toDate).isBefore(leaveYearEnd)
+      );
     });
     const entitlement = 200;
     const earned = this.getCurrentEarned(currentHolidays);

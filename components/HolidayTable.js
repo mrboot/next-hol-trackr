@@ -38,6 +38,11 @@ const HolidayTable = props => {
     return colours;
   });
 
+  const displayDates = holDate => {
+    // console.log(moment(holDate));
+    return moment(holDate).format('ddd Do MMM YYYY');
+  };
+
   const columns = [
     {
       title: 'Description',
@@ -46,10 +51,12 @@ const HolidayTable = props => {
     {
       title: 'Start Date',
       dataIndex: 'fromDate',
+      render: fromDate => <span>{displayDates(fromDate)}</span>,
     },
     {
       title: 'End Date',
       dataIndex: 'toDate',
+      render: toDate => <span>{displayDates(toDate)}</span>,
     },
     {
       title: 'Category',
