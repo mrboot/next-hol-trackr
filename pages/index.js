@@ -14,6 +14,9 @@ class Index extends React.Component {
   state = {
     holidays: this.props.holidays,
     categories: this.props.categories,
+    leaveYearStart: this.props.leaveYearStart,
+    leaveYearEnd: this.props.leaveYearEnd,
+    leaveYearDisplay: this.props.leaveYearDisplay,
     updated: false,
   };
 
@@ -22,7 +25,8 @@ class Index extends React.Component {
     const holidays = await holRes.json();
     const catRes = await fetch(`${serverAddr}/db/categories`);
     const categories = await catRes.json();
-    return { holidays, categories };
+    const { leaveYearStart, leaveYearEnd, leaveYearDisplay } = this.getLeaveYear();
+    return { holidays, categories, leaveYearStart, leaveYearEnd, leaveYearDisplay };
   };
 
   async componentDidUpdate() {
@@ -32,7 +36,7 @@ class Index extends React.Component {
     }
   }
 
-  getLeaveYear = () => {
+  static getLeaveYear() {
     const now = moment();
     const currentYear = now.year();
 
@@ -46,6 +50,30 @@ class Index extends React.Component {
     const leaveYearEnd = moment(`${currentYear + 1}-03-31`);
     const leaveYearDisplay = `${currentYear} / ${currentYear + 1}`;
     return { leaveYearStart, leaveYearEnd, leaveYearDisplay };
+  }
+
+  getNextLeaveYear = () => {
+    const { leaveYearStart, leaveYearEnd } = this.state;
+    const nextLeaveYearStart = moment(leaveYearStart).add(1, 'y');
+    const nextLeaveYearEnd = moment(leaveYearEnd).add(1, 'y');
+    const nextLeaveYearDisplay = `${nextLeaveYearStart.year()} / ${nextLeaveYearEnd.year()}`;
+    this.setState({
+      leaveYearStart: nextLeaveYearStart,
+      leaveYearEnd: nextLeaveYearEnd,
+      leaveYearDisplay: nextLeaveYearDisplay,
+    });
+  };
+
+  getPreviousLeaveYear = () => {
+    const { leaveYearStart, leaveYearEnd } = this.state;
+    const prevLeaveYearStart = moment(leaveYearStart).subtract(1, 'y');
+    const prevLeaveYearEnd = moment(leaveYearEnd).subtract(1, 'y');
+    const prevLeaveYearDisplay = `${prevLeaveYearStart.year()} / ${prevLeaveYearEnd.year()}`;
+    this.setState({
+      leaveYearStart: prevLeaveYearStart,
+      leaveYearEnd: prevLeaveYearEnd,
+      leaveYearDisplay: prevLeaveYearDisplay,
+    });
   };
 
   getCurrentEarned = holidays => {
@@ -88,8 +116,8 @@ class Index extends React.Component {
   };
 
   render() {
-    const { holidays, categories } = this.state;
-    const { leaveYearStart, leaveYearEnd, leaveYearDisplay } = this.getLeaveYear();
+    const { holidays, categories, leaveYearStart, leaveYearEnd, leaveYearDisplay } = this.state;
+    // const { leaveYearStart, leaveYearEnd, leaveYearDisplay } = this.getLeaveYear();
     const currentHolidays = holidays.filter(holiday => {
       return (
         moment(holiday.fromDate).isAfter(leaveYearStart) &&
@@ -104,14 +132,14 @@ class Index extends React.Component {
     return (
       <Layout>
         <Header>
-          <Button type="primary">
+          <Button type="primary" onClick={this.getPreviousLeaveYear}>
             <Icon type="left" />
             Previous Year
           </Button>
           <span
             style={{ fontSize: '1.5em', color: 'white', marginLeft: 10, marginRight: 10 }}
           >{`Current Leave Year: ${leaveYearDisplay}`}</span>
-          <Button type="primary">
+          <Button type="primary" onClick={this.getNextLeaveYear}>
             Next Year
             <Icon type="right" />
           </Button>

@@ -18,7 +18,7 @@ Learning as I go so expect mistakes and _\*cough\*_ not industry standard coding
 - [x] ~~make positive or negative hours based on category~~
 - [x] ~~display in hours and days~~
 - [x] ~~display current balance~~
-- [ ] make different years browsable
+- [x] ~~make different years browsable~~
 - [ ] make the description editable
 - [ ] migrate to Postgres and Sequalize for database & connectivity
 - [ ] add tests
