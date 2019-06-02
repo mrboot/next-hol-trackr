@@ -32,27 +32,31 @@ const Configuration = ({ entitlement }) => {
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        <label htmlFor="baseLeave">Base Entitlement:</label>
-        <input
-          value={baseLeave}
-          onChange={e => setBaseLeave(parseInt(e.target.value, 10))}
-          type="number"
-          step="4"
-          name="baseLeave"
-          id="baseLeave"
-          required
-        />
+        <label htmlFor="baseLeave">
+          <input
+            value={baseLeave}
+            onChange={e => setBaseLeave(parseInt(e.target.value, 10))}
+            type="number"
+            step="4"
+            name="baseLeave"
+            id="baseLeave"
+            required
+          />
+          Base Entitlement:
+        </label>
         <br />
-        <label htmlFor="carriedLeave">Carried Over:</label>
-        <input
-          value={carriedLeave}
-          onChange={e => setCarriedLeave(parseInt(e.target.value, 10))}
-          type="number"
-          step="4"
-          name="carriedLeave"
-          id="carriedLeave"
-          required
-        />
+        <label htmlFor="carriedLeave">
+          <input
+            value={carriedLeave}
+            onChange={e => setCarriedLeave(parseInt(e.target.value, 10))}
+            type="number"
+            step="4"
+            name="carriedLeave"
+            id="carriedLeave"
+            required
+          />
+          Carried Over:
+        </label>
         <br />
         <button type="submit">Submit</button>
         <button type="button" onClick={() => Router.push('/')}>
