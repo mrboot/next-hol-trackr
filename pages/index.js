@@ -1,6 +1,7 @@
 /* eslint-disable func-names */
 import React from 'react';
-import { Divider, Button, Icon, Layout } from 'antd';
+import Router from 'next/router';
+import { Divider, Button, Icon, Layout, Collapse } from 'antd';
 import fetch from 'isomorphic-unfetch';
 import moment from 'moment';
 import { serverAddr } from '../config';
@@ -9,6 +10,19 @@ import HolidayTable from '../components/HolidayTable';
 import HolidayForm from '../components/HolidayForm';
 
 const { Header, Content } = Layout;
+const { Panel } = Collapse;
+
+const customPanelStyle = {
+  fontSize: '1.5em',
+  // marginLeft: 50,
+  // marginRight: 50,
+  marginTop: 10,
+  background: '#F0F2F5',
+  borderRadius: 4,
+  marginBottom: 24,
+  border: 0,
+  overflow: 'hidden',
+};
 
 class Index extends React.Component {
   state = {
@@ -17,6 +31,7 @@ class Index extends React.Component {
     leaveYearStart: this.props.leaveYearStart,
     leaveYearEnd: this.props.leaveYearEnd,
     leaveYearDisplay: this.props.leaveYearDisplay,
+    entitlement: this.props.entitlement,
     updated: false,
   };
 
@@ -26,7 +41,10 @@ class Index extends React.Component {
     const catRes = await fetch(`${serverAddr}/db/categories`);
     const categories = await catRes.json();
     const { leaveYearStart, leaveYearEnd, leaveYearDisplay } = this.getLeaveYear();
-    return { holidays, categories, leaveYearStart, leaveYearEnd, leaveYearDisplay };
+    const leaveYearDB = leaveYearDisplay.replace(' / ', '-');
+    const entitlementRes = await fetch(`${serverAddr}/db/entitlement/${leaveYearDB}`);
+    const entitlement = await entitlementRes.json();
+    return { holidays, categories, leaveYearStart, leaveYearEnd, leaveYearDisplay, entitlement };
   };
 
   async componentDidUpdate() {
@@ -57,6 +75,8 @@ class Index extends React.Component {
     const nextLeaveYearStart = moment(leaveYearStart).add(1, 'y');
     const nextLeaveYearEnd = moment(leaveYearEnd).add(1, 'y');
     const nextLeaveYearDisplay = `${nextLeaveYearStart.year()} / ${nextLeaveYearEnd.year()}`;
+    const leaveYearDB = nextLeaveYearDisplay.replace(' / ', '-');
+    this.getEntitlement(leaveYearDB);
     this.setState({
       leaveYearStart: nextLeaveYearStart,
       leaveYearEnd: nextLeaveYearEnd,
@@ -69,10 +89,13 @@ class Index extends React.Component {
     const prevLeaveYearStart = moment(leaveYearStart).subtract(1, 'y');
     const prevLeaveYearEnd = moment(leaveYearEnd).subtract(1, 'y');
     const prevLeaveYearDisplay = `${prevLeaveYearStart.year()} / ${prevLeaveYearEnd.year()}`;
+    const leaveYearDB = prevLeaveYearDisplay.replace(' / ', '-');
+    this.getEntitlement(leaveYearDB);
     this.setState({
       leaveYearStart: prevLeaveYearStart,
       leaveYearEnd: prevLeaveYearEnd,
       leaveYearDisplay: prevLeaveYearDisplay,
+      // entitlement: prevLeaveYearEntitlement,
     });
   };
 
@@ -115,19 +138,32 @@ class Index extends React.Component {
     this.setState({ updated: true });
   };
 
+  getEntitlement = async year => {
+    const entitlementRes = await fetch(`${serverAddr}/db/entitlement/${year}`);
+    const entitlement = await entitlementRes.json();
+    this.setState({ entitlement });
+    // return entitlement;
+  };
+
   render() {
-    const { holidays, categories, leaveYearStart, leaveYearEnd, leaveYearDisplay } = this.state;
-    // const { leaveYearStart, leaveYearEnd, leaveYearDisplay } = this.getLeaveYear();
+    const {
+      holidays,
+      categories,
+      leaveYearStart,
+      leaveYearEnd,
+      leaveYearDisplay,
+      entitlement,
+    } = this.state;
     const currentHolidays = holidays.filter(holiday => {
       return (
         moment(holiday.fromDate).isAfter(leaveYearStart) &&
         moment(holiday.toDate).isBefore(leaveYearEnd)
       );
     });
-    const entitlement = 200;
+    const currentEntitlement = entitlement.base + entitlement.carried;
     const earned = this.getCurrentEarned(currentHolidays);
     const taken = this.getCurrentTaken(currentHolidays);
-    const balance = entitlement + earned - taken;
+    const balance = currentEntitlement + earned - taken;
 
     return (
       <Layout>
@@ -138,28 +174,33 @@ class Index extends React.Component {
           </Button>
           <span
             style={{ fontSize: '1.5em', color: 'white', marginLeft: 10, marginRight: 10 }}
-          >{`Current Leave Year: ${leaveYearDisplay}`}</span>
+          >{`Leave Year: ${leaveYearDisplay}`}</span>
           <Button type="primary" onClick={this.getNextLeaveYear}>
             Next Year
             <Icon type="right" />
           </Button>
         </Header>
         <Content>
-          <div>
-            <p
-              style={{
-                fontSize: '1.5em',
-                marginLeft: 50,
-                marginRight: 50,
-                marginTop: 10,
-              }}
+          <Collapse
+            bordered={false}
+            defaultActiveKey={['0']}
+            expandIcon={({ isActive }) => <Icon type="caret-right" rotate={isActive ? 90 : 0} />}
+          >
+            <Panel
+              header={`Current Balance: ${this.displayDays(balance)}`}
+              key="1"
+              style={customPanelStyle}
             >
-              {`Entitlement: ${this.displayDays(entitlement)}, 
-              Earned: ${this.displayDays(earned)}, 
-              Taken: ${this.displayDays(taken)}, 
-              Remaining: ${this.displayDays(balance)}`}
-            </p>
-          </div>
+              <ul>
+                <li>{`Entitlement: ${this.displayDays(entitlement.base)}`}</li>
+                <li>{`Carried Over: ${this.displayDays(entitlement.carried)}`}</li>
+                <li>{`Toil Earned: ${
+                  this.displayDays(earned) === '' ? 'None' : this.displayDays(earned)
+                }`}</li>
+                <li>{`Holiday Taken: ${this.displayDays(taken)}`}</li>
+              </ul>
+            </Panel>
+          </Collapse>
           <HolidayTable
             currentHolidays={currentHolidays}
             categories={categories}
@@ -167,6 +208,25 @@ class Index extends React.Component {
           />
           <Divider>Add New Holiday</Divider>
           <HolidayForm categories={categories} onAddRefresh={this.toggleUpdated} />
+          <Divider>Configuration</Divider>
+          <p
+            style={{
+              display: 'inline-block',
+              fontSize: '1.5em',
+              marginLeft: 50,
+              marginRight: 20,
+              marginTop: 10,
+            }}
+          >
+            To set up initial entitlement and add any carried over leave, click here:
+          </p>
+          <Button
+            type="primary"
+            onClick={() => Router.push(`/configuration?year=${entitlement.year}`)}
+          >
+            Config
+            <Icon type="edit" />
+          </Button>
         </Content>
       </Layout>
     );

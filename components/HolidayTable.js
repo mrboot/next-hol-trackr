@@ -1,4 +1,4 @@
-/* eslint-disable react/react-in-jsx-scope */
+import React from 'react';
 import { Table, Tag, Button } from 'antd';
 import moment from 'moment';
 import { serverAddr } from '../config';
