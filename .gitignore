@@ -3,5 +3,6 @@
 .env
 .vscode
 .DS_Store
-/db/*
+/db/entitlements.json
+/db/holidays.json
 !*.gitkeep
