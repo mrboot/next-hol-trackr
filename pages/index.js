@@ -57,15 +57,17 @@ class Index extends React.Component {
   static getLeaveYear() {
     const now = moment();
     const currentYear = now.year();
+    const leaveYearStartBreakPoint = moment(`${currentYear}-04-01`).startOf('day');
+    const leaveYearEndBreakPoint = moment(`${currentYear}-03-31`).endOf('day');
 
-    if (now.isBefore(moment(`${currentYear}-04-01`))) {
-      const leaveYearStart = moment(`${currentYear - 1}-04-01`);
-      const leaveYearEnd = moment(`${currentYear}-03-31`);
+    if (now.isBefore(leaveYearStartBreakPoint)) {
+      const leaveYearStart = leaveYearStartBreakPoint.subtract(1, 'y');
+      const leaveYearEnd = leaveYearEndBreakPoint;
       const leaveYearDisplay = `${currentYear - 1} / ${currentYear}`;
       return { leaveYearStart, leaveYearEnd, leaveYearDisplay };
     }
-    const leaveYearStart = moment(`${currentYear}-04-01`);
-    const leaveYearEnd = moment(`${currentYear + 1}-03-31`);
+    const leaveYearStart = leaveYearStartBreakPoint;
+    const leaveYearEnd = leaveYearEndBreakPoint.add(1, 'y');
     const leaveYearDisplay = `${currentYear} / ${currentYear + 1}`;
     return { leaveYearStart, leaveYearEnd, leaveYearDisplay };
   }
@@ -156,8 +158,8 @@ class Index extends React.Component {
     } = this.state;
     const currentHolidays = holidays.filter(holiday => {
       return (
-        moment(holiday.fromDate).isAfter(leaveYearStart) &&
-        moment(holiday.toDate).isBefore(leaveYearEnd)
+        moment(holiday.fromDate).isSameOrAfter(leaveYearStart, 'day') &&
+        moment(holiday.toDate).isSameOrBefore(leaveYearEnd, 'day')
       );
     });
     const currentEntitlement = entitlement.base + entitlement.carried;
